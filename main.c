@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
         }
   }
 
-  convertBnW(imageComponents, imgWidth, imgHeight, buffer);
-
+  convertBnW(imageComponents, imgWidth, imgHeight, &buffer);
+  exportImage(imageComponents, imgWidth, imgHeight, &buffer, argv[2]);
 	return 0;
 }
