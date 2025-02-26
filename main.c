@@ -65,5 +65,6 @@ int main(int argc, char *argv[])
 
   convertBnW(imageComponents, imgWidth, imgHeight, &buffer);
   exportImage(imageComponents, imgWidth, imgHeight, &buffer, argv[2]);
+  imgtoText(imageComponents, imgWidth, imgHeight, buffer);
 	return 0;
 }
