@@ -43,7 +43,7 @@
 // }
 int main(int argc, char *argv[])
 {
-	if(argc < 5)
+	if(argc < 3)
 	{
 		printf("error, not enough parameters\n");
 		return 0;
@@ -54,17 +54,17 @@ int main(int argc, char *argv[])
 	int imgWidth = 0;
 	int imgHeight = 0;
 	readImage(argv[1], &buffer, &imageComponents, &imgWidth, &imgHeight);
-	printf("%d %d %d \n", imageComponents, imgWidth, imgHeight);
+	//printf("%d %d %d \n", imageComponents, imgWidth, imgHeight);
 
   for (int row = 0; row < imgHeight; ++row) {
         for (int column = 0; column < imgWidth; ++column) {
             int index = column * imageComponents;
-            printf("Row %d Column %d Pixel R=%d G=%d B=%d\n", row, column, buffer[row][index], buffer[row][index + 1], buffer[row][index + 2]);
+            //printf("Row %d Column %d Pixel R=%d G=%d B=%d\n", row, column, buffer[row][index], buffer[row][index + 1], buffer[row][index + 2]);
         }
   }
 
   convertBnW(imageComponents, imgWidth, imgHeight, &buffer);
   exportImage(imageComponents, imgWidth, imgHeight, &buffer, argv[2]);
-  imgtoText(imageComponents, imgWidth, imgHeight, buffer, argv[3], argv[4]);
+  imgtoText(imageComponents, imgWidth, imgHeight, buffer, 50, 50);
 	return 0;
 }

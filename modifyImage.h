@@ -43,16 +43,17 @@ void exportImage(int components, int width, int height, unsigned char ***buffer,
   JSAMPROW row_pointer[1];
   int row = 0;
   while (cinfo.next_scanline < cinfo.image_height) { 
-    printf("oke\n");
+    //printf("oke\n");
     //row_pointer[0] = **buffer + cinfo.next_scanline * row_stride;
     row_pointer[0] = (*buffer)[cinfo.next_scanline];
-    printf("oke2\n");
+    //printf("oke2\n");
     (void) jpeg_write_scanlines(&cinfo, row_pointer, 1);
   }
    jpeg_finish_compress(&cinfo);
    jpeg_destroy_compress(&cinfo);
   printf("export completed\n");
 }
+
 void convertBnW(int components, int width, int height, unsigned char ***buffer){
 
   for(int row = 0; row < height; ++row){
@@ -71,16 +72,60 @@ void convertBnW(int components, int width, int height, unsigned char ***buffer){
       (*buffer)[row][index + 2] = gray;
 
 
-      printf("new r: %d  and c:%d -> %d %d %d\n", row, column, (*buffer)[row][index], (*buffer)[row][index+1], (*buffer)[row][index+2]);
+      //printf("new r: %d  and c:%d -> %d %d %d\n", row, column, (*buffer)[row][index], (*buffer)[row][index+1], (*buffer)[row][index+2]);
     }
   }
     
   printf("modified\n");
 }
 
+
+void pixalate(int components, int width, int height, unsigned char **buffer, unsigned char ***newBuffer, int newWidth, int newHeight){
+
+  /* --|--|--
+   * --|--|--
+   * ________
+   * --|--|--
+   * --|--|--
+   *___________
+   * --|--|--
+   * --|--|--
+   *
+   *Above is how we convert a 6x6 matrix in a 3x3, we will see how many pixels we need to compress(width/newWidth x height/newWidth or 6/3 x 6/3 in this case)
+    we either do the medium of all pixel values for the new value of the compressed pixel, or we choose the one with higher occurence
+   * */
+  int L = height/newHeight;
+  int l = width/newWidth;
+  
+
+  *newBuffer = (unsigned char **)malloc(newHeight * sizeof(unsigned char *));
+ 
+  int newRow = 0;
+  int newColumn = 0;
+
+  for(int row = 0; row < height; row += L){
+    int row_stride = components * newWidth;
+    (*newBuffer)[newRow++] = (unsigned char *)malloc(row_stride);
+      
+    for(int column = 0; column < width; column += l){
+        int curentValue = 0;
+        for(int i = row; i < row + L; ++i){
+          for(int j = column; j < column + l; ++j){
+            curentValue += buffer[row][j * components];
+          }
+        }
+        curentValue/=L*l;
+        newBuffer[newRow][newColumn * components];
+    }
+
+  }
+
+}
+
+
+//void imgtoText(int components, int width, int height, unsigned char **buffer, int newWidth, int newHeight){
 void imgtoText(int components, int width, int height, unsigned char **buffer, int newWidth, int newHeight){
-  /* _ for black space, otherwise, for each different gray value,  use new character
-   observation, if red = blue = green, then the resulting color is a shade of gray
+  /* observation, if red = blue = green, then the resulting color is a shade of gray
    the pixel values are in the interval [0,256] (black and white included), so for each shade of gray, we need
    256 symbols, but he have only 128 ascii code, and some are reserved
    0 and 256 will have their own symbols, the rest of the values will be divided in subsets, each subset, will have a ascii symbol 
@@ -123,6 +168,21 @@ void imgtoText(int components, int width, int height, unsigned char **buffer, in
 
   int L = height/newHeight;
   int l = width/newWidth;
+  
+  for(int row = 0; row < height; row += L){
+    for(int column = 0; column < width; column += l){
+        int curentValue = 0;
+        for(int i = row; i < row + L; ++i){
+          for(int j = column; j < column + l; ++j){
+            curentValue += buffer[row][j * components];
+          }
+        }
+        curentValue/=L*l; 
+        printf("%c", colorMap[curentValue]);
+    }
+    printf("\n");
+  }
+
   printf("\n");
   for(int row = 0; row < height; row++){
     for(int column=0; column < height; column++){

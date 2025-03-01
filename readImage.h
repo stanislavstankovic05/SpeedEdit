@@ -52,7 +52,7 @@ void readImage(char *filename, unsigned char ***buffer, int * imageComponents, i
 
 		for(int i=0;i<cinfo.image_width;++i){
 			int index = i * cinfo.output_components;
- 			printf(" row %d column %d Pixel %d, %d, %d, \n", row, i, rowBuffer[index], rowBuffer[index+1], rowBuffer[index+2]);
+ 			//printf(" row %d column %d Pixel %d, %d, %d, \n", row, i, rowBuffer[index], rowBuffer[index+1], rowBuffer[index+2]);
 		}
 		row++;
   	}	
