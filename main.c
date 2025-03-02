@@ -9,38 +9,7 @@
 #include "modifyImage.h"
 
 
-// void readImage(char *filename)
-// {
-// 	FILE *image = fopen(filename, "rb");
-// 	if(!image){
-// 		printf("error");
-// 		return;
-// 	}
-// 	//standard structures to read JPEG file
-// 	struct jpeg_decompress_struct imageInfo;
-// 	struct jpeg_error_mgr jerr;
 
-// 	imageInfo.err = jpeg_std_error(&jerr);
-// 	jpeg_create_decompress(&imageInfo);
-
-// 	//the actuall reading process
-	
-// 	jpeg_stdio_src(&imageInfo,image);
-// 	jpeg_read_header(&imageInfo, TRUE);
-// 	jpeg_start_decompress(&imageInfo);
-
-// 	int width = imageInfo.output_width;
-// 	int numberComponents = imageInfo.output_components;
-// 	printf("%dx \n", width);
-	
-// 	unsigned char *rowBuffer = (unsigned char *) malloc(width *numberComponents);
-// 	jpeg_read_scanlines(&imageInfo, &rowBuffer,1);
-// 	for (int i=0; i < width ; ++i){
-// 		int index = i * numberComponents;
-// 		printf("Pixel %d, %d, %d, \n", rowBuffer[index], rowBuffer[index+1],rowBuffer[index+2]);
-// 	}
-
-// }
 int main(int argc, char *argv[])
 {
 	if(argc < 3)
@@ -65,6 +34,16 @@ int main(int argc, char *argv[])
 
   convertBnW(imageComponents, imgWidth, imgHeight, &buffer);
   exportImage(imageComponents, imgWidth, imgHeight, &buffer, argv[2]);
+  unsigned char **newBuffer;
+  
   imgtoText(imageComponents, imgWidth, imgHeight, buffer, 50, 50);
-	return 0;
+
+  printf(" test pixalate\n");
+  pixalateImage(imageComponents, imgWidth, imgHeight, buffer, &newBuffer, 50, 50);
+  
+
+  printf("pixalate succesfull\n");  
+  exportImage(imageComponents, 50, 50, &newBuffer, argv[2]);
+  printf("export succesfull");
+  return 0;
 }

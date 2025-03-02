@@ -9,7 +9,7 @@
 #include <setjmp.h>
 #include <string.h>
 
-
+#define max(a,b) ((a) > (b) ? (a) : (b))
 void exportImage(int components, int width, int height, unsigned char ***buffer, char *exportFile){
 
   /* start compressing*/
@@ -80,7 +80,7 @@ void convertBnW(int components, int width, int height, unsigned char ***buffer){
 }
 
 
-void pixalate(int components, int width, int height, unsigned char **buffer, unsigned char ***newBuffer, int newWidth, int newHeight){
+void pixalateImage(int components, int width, int height, unsigned char **buffer, unsigned char ***newBuffer, int newWidth, int newHeight){
 
   /* --|--|--
    * --|--|--
@@ -94,32 +94,57 @@ void pixalate(int components, int width, int height, unsigned char **buffer, uns
    *Above is how we convert a 6x6 matrix in a 3x3, we will see how many pixels we need to compress(width/newWidth x height/newWidth or 6/3 x 6/3 in this case)
     we either do the medium of all pixel values for the new value of the compressed pixel, or we choose the one with higher occurence
    * */
-  int L = height/newHeight;
-  int l = width/newWidth;
+  int L = height/newHeight + 1;
+  int l = width/newWidth + 1;
   
-
+  //printf("l = %d, L = %d \n", l, L);
   *newBuffer = (unsigned char **)malloc(newHeight * sizeof(unsigned char *));
- 
-  int newRow = 0;
-  int newColumn = 0;
-
-  for(int row = 0; row < height; row += L){
-    int row_stride = components * newWidth;
-    (*newBuffer)[newRow++] = (unsigned char *)malloc(row_stride);
-      
-    for(int column = 0; column < width; column += l){
-        int curentValue = 0;
-        for(int i = row; i < row + L; ++i){
-          for(int j = column; j < column + l; ++j){
-            curentValue += buffer[row][j * components];
-          }
-        }
-        curentValue/=L*l;
-        newBuffer[newRow][newColumn * components];
-    }
-
+  for(int row = 0; row < newHeight; row++){
+    (*newBuffer)[row] = (unsigned char *)malloc(newWidth * components);
   }
 
+  int newRow = 0;
+  int newColumn = 0;
+  
+
+  int colorFrecv[256];
+  for(int row = 0; row < height; row += L){
+    //printf("\n\n\n\n row = %d \n\n\n\n\n", newRow);
+    newColumn = 0;
+    for(int i = 0; i <= 256; ++i)
+      colorFrecv[i] = 0;
+    for(int column = 0; column < width; column += l){
+        int curentValue_red = 0;
+        int curentValue_green = 0;
+        int curentValue_blue;
+        for(int i = row; i < row + L; ++i){
+          for(int j = column; j < column + l; ++j){
+            curentValue_red += buffer[row][j * components];
+            curentValue_blue += buffer[row][j * components + 1];
+            curentValue_green += buffer[row][j * components + 2];
+            //colorFrecv[buffer[row][j * components]]++;
+          }
+        }
+        curentValue_red/=L*l;
+        curentValue_green/=L*l;
+        curentValue_blue/=L*l;
+        /*int maxColor = -1;
+        int maxFrecv = -1;
+        for(int index = 0; index <= 256; ++index){
+          if(colorFrecv[index] > maxFrecv){
+            maxFrecv = colorFrecv[index];
+            maxColor = index;
+          }
+        }*/
+        (*newBuffer)[newRow][newColumn * components] = curentValue_red;
+        (*newBuffer)[newRow][newColumn * components + 1] = curentValue_blue;
+        (*newBuffer)[newRow][newColumn * components + 2] = curentValue_green;
+        //printf("column %d = %d |", newColumn, curentValue);
+        newColumn++;
+    }
+    newRow++;
+  }
+  //printf("height: %d \n", height);
 }
 
 
